@@ -6,11 +6,9 @@ NOTE: These test rely on specific data in `staging` environment.
 If the data is missing then it can be reloaded using the data files in `src/test/resources/data/`.
 Specifically
 
-| file                |type of data|
-|---------------------|------------|
-| email_ipp.csv       | ipp relationship data|
-| email_reject.csv    | watchlist data|
-| email_addresses.csv |used to drive the watchlist simulation|
+| file             |type of data|
+|------------------|------------|
+| emails.csv       |used to drive the watchlist simulation|
 
 ## Running the tests
 
@@ -22,28 +20,45 @@ Prior to executing the tests ensure you have:
 If you don't have mongodb installed locally you can run it in docker using the following commands:
 
 ```bash
-    docker run --restart unless-stopped --name mongodb -p 27017:27017 -d percona/percona-server-mongodb:7.0 --replSet rs0
-    docker exec -it mongodb mongosh --eval "rs.initiate();"
+    docker run --rm -d -p 27017:27017 --name mongo percona/percona-server-mongodb:7.0
 ```
 
 If you don't have postgres installed locally you can run it in docker using the following command
 
 ```bash
-    docker run -d --rm --name postgresql -e POSTGRES_USER=postgres -e POSTGRES_PASSWORD=postgres -p 5432:5432 postgres:latest
+    docker run -d --rm --name postgresql -e POSTGRES_DB=emailinsights -e POSTGRES_USER=postgres -e POSTGRES_PASSWORD=postgres -p 5432:5432 postgres:latest
 ```
 
-Run the following script to start the dependent services locally `./start_services.sh`
+If you don't have localstack installed locally you can run it in docker using the following commands:
 
-#### Smoke test
-
-Before raising a PR, ensure the smoke tests pass locally by running this script:
 ```bash
-  ./run-local.sh
+    docker run --rm -d --name localstack -p 4566:4566 -p 4571:4571 localstack/localstack
 ```
+
+You will need to have the following environment variables set in order to connect to localstack; they can be anything but are required by the SDK:
+
+```bash
+export AWS_REGION=eu-west-2
+export AWS_ACCESS_KEY_ID=test
+export AWS_SECRET_ACCESS_KEY=test
+```
+
+To start email-insights service locally, open the email-insights repository and follow the README guidance to start up the service.
+
+#### To start the required services locally, run:
+
+./start_services.sh
 
 #### Run the performance test
 
 To run a full performance test against staging environment, implement a job builder and run the test **only** from Jenkins.
+
+#### Smoke tests
+
+Before raising a PR, ensure the smoke tests pass locally by running this script:
+```bash
+  ./run_local.sh
+```
 
 ### Scalafmt
 This repository uses [Scalafmt](https://scalameta.org/scalafmt/), a code formatter for Scala. The formatting rules configured for this repository are defined within [.scalafmt.conf](.scalafmt.conf).
