@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 HM Revenue & Customs
+ * Copyright 2023 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,19 +23,18 @@ import uk.gov.hmrc.performance.conf.ServicesConfiguration
 
 object InsightsRequests extends ServicesConfiguration {
 
-  val baseUrl: String = baseUrlFor("email-insights-proxy")
+  val baseUrl: String = baseUrlFor("email-gateway")
 
-  val checkWatchListThroughProxy: HttpRequestBuilder =
+  val checkWatchListForEmailInsights: HttpRequestBuilder =
     http("Check if email is on watch list")
       .post(s"$baseUrl/check/insights")
       .header(HttpHeaderNames.ContentType, "application/json")
       .header(HttpHeaderNames.UserAgent, "email-insights-performance-tests")
-      .header("X-Correlation-ID", "1234566789")
+        .header("X-Correlation-ID", "performance-test")
       .body(StringBody("""|{
                           |  "email" : "#{email}"
                           |}
                           |""".stripMargin))
       .asJson
       .check(status.is(200))
-
 }
