@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-sm2 --start EMAIL_INSIGHTS_PROXY EMAIL_GATEWAY INTERNAL_AUTH CIP_RISK --appendArgs '{
+sm2 --start EMAIL_INSIGHTS_PROXY EMAIL_INSIGHTS EMAIL_GATEWAY INTERNAL_AUTH CIP_RISK --appendArgs '{
             "EMAIL_INSIGHTS_PROXY": [
                 "-J-Dauditing.consumer.baseUri.port=6001",
                 "-J-Dauditing.consumer.baseUri.host=localhost",
