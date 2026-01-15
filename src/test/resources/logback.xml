@@ -15,6 +15,8 @@
     <!-- Sets the performance-test-runner log level-->
     <logger name="uk.gov.hmrc.performance" level="INFO"/>
 
+    <logger name="uk.gov.hmrc.perftests" level="INFO"/>
+
     <root level="WARN">
         <appender-ref ref="CONSOLE"/>
     </root>
