@@ -10,7 +10,7 @@ sm2 --start EMAIL_INSIGHTS_PROXY EMAIL_INSIGHTS EMAIL_GATEWAY INTERNAL_AUTH CIP_
                 "-J-Dmicroservice.services.access-control.allow-list.1=email-insights-performance-tests"
             ],
             "EMAIL_INSIGHTS": [
-                "-J-Dmicroservice.phone-number-insights.database.dbName=postgres",
+                "-J-Dmicroservice.email-insights.database.dbName=postgres",
                 "-J-Dauditing.enabled=false"
             ],
             "CIP_RISK": [

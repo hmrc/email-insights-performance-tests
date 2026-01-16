@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 HM Revenue & Customs
+ * Copyright 2025 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,16 +14,10 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.perftests.example
+package uk.gov.hmrc.perftests.insights.utils
 
-import uk.gov.hmrc.performance.simulation.PerformanceTestRunner
-import uk.gov.hmrc.perftests.example.InsightsRequests.checkWatchListForEmailInsights
+import org.slf4j.{Logger, LoggerFactory}
 
-
-class InsightsSimulation extends PerformanceTestRunner {
-
-  setup("check-watch-list-gateway", "Check watch list via Gateway") withRequests
-    checkWatchListForEmailInsights
-
-  runSimulation()
+trait Logging {
+  val logger: Logger = LoggerFactory.getLogger(getClass)
 }
