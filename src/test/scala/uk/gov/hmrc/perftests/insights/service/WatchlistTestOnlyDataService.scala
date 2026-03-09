@@ -17,6 +17,7 @@
 package uk.gov.hmrc.perftests.insights.service
 
 import io.gatling.http.Predef.HttpHeaderNames
+import play.api.libs.json.{JsString, Json}
 import play.api.libs.ws.StandaloneWSResponse
 import uk.gov.hmrc.perftests.insights.InsightsRequests.baseUrlFor
 import uk.gov.hmrc.perftests.insights.client.HttpClientHelper
@@ -46,21 +47,13 @@ trait WatchlistTestOnlyDataService extends HttpClientHelper with Logging {
       finally source.close()
     }
 
-  def insertWatchlistEmails(numberOfGeneratedEmails: Int): Unit = {
-    val feederEmailsOnWatchlist = readEmailsFromFeederFile()
-      .map(email => s""""$email"""")
-      .mkString(",")
-
-    val request =
-      s"""{
-         |  "generatedEntries":{
-         |    "numberOfEntries":$numberOfGeneratedEmails
-         |   },
-         |  "manualEntries":{
-         |    "emailAddresses":[$feederEmailsOnWatchlist]
-         |   }
-         |}""".stripMargin
-
+  def createWatchlistEmails(numberOfGeneratedEmails: Int): Unit = {
+    val emails = readEmailsFromFeederFile()
+    val payload = Json.obj(
+      "generatedEntries" -> Json.obj("numberOfEntries" -> numberOfGeneratedEmails),
+      "manualEntries" -> Json.obj("emailAddresses" -> emails)
+    )
+    val request = Json.stringify(payload)
     val response: StandaloneWSResponse =
       post(s"$baseUrl/email-insights-proxy/test-only/watchlist/data/create", request, headers: _*)
 
@@ -72,5 +65,36 @@ trait WatchlistTestOnlyDataService extends HttpClientHelper with Logging {
       delete(s"$baseUrl/email-insights-proxy/test-only/watchlist/data/delete", headers: _*)
 
     logger.info(s"Deleted emails from watchlist, response status: ${response.status} and body: ${response.body}")
+  }
+
+  def createGraphData(numberOfRandomEmails: Int, batchSize: Int): Unit = {
+    val emails = readEmailsFromFeederFile()
+    val vertexRecords = Json.arr(
+      Json.obj(
+        "vertexId" -> 1,
+        "attributeId" -> JsString(emails.headOption.getOrElse("")),
+        "data" -> "{}",
+        "vertexType" -> "email",
+        "hopsToClosestRisky" -> 1
+      )
+    )
+    val payload = Json.obj(
+      "randomEntriesToGenerate" -> numberOfRandomEmails,
+      "batchInsertSize" -> batchSize,
+      "vertexRecords" -> vertexRecords
+    )
+    val request = Json.stringify(payload)
+    val response: StandaloneWSResponse =
+      post(s"$baseUrl/test-only/cip-risk/str/vertex-data", request, headers: _*)
+
+    val message = (Json.parse(response.body) \ "message").asOpt[String].getOrElse("No message found")
+    logger.info(s"Inserted emails into graph testonly endpoint, response status: ${response.status} and body: {\"message\":\"$message\"}")
+  }
+
+  def deleteGraphDataEmails(): Unit = {
+    val response: StandaloneWSResponse =
+      delete(s"$baseUrl/test-only/cip-risk/str/vertex-data", headers: _*)
+
+    logger.info(s"Deleted emails from graph testonly endpoint, response status: ${response.status} and body: ${response.body}")
   }
 }

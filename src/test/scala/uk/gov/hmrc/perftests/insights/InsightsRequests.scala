@@ -25,7 +25,7 @@ object InsightsRequests extends ServicesConfiguration {
 
   val baseUrl: String = baseUrlFor("email-gateway")
 
-  val checkWatchListForEmailInsights: HttpRequestBuilder =
+  val checkEmailInsights: HttpRequestBuilder =
     http("Check if email is on watch list")
       .post(s"$baseUrl/check/insights")
       .header(HttpHeaderNames.ContentType, "application/json")

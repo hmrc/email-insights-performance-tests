@@ -2,18 +2,22 @@
 
 sm2 --start EMAIL_INSIGHTS_PROXY EMAIL_INSIGHTS EMAIL_GATEWAY INTERNAL_AUTH CIP_RISK --appendArgs '{
             "EMAIL_INSIGHTS_PROXY": [
-                "-J-Dauditing.consumer.baseUri.port=6001",
-                "-J-Dauditing.consumer.baseUri.host=localhost",
-                "-J-Dauditing.enabled=false",
-                "-J-Dmicroservice.services.access-control.enabled=true",
-                "-J-Dmicroservice.services.access-control.allow-list.0=email-gateway",
-                "-J-Dmicroservice.services.access-control.allow-list.1=email-insights-performance-tests"
+            "-Dauditing.consumer.baseUri.port=6001",
+            "-Dauditing.consumer.baseUri.host=localhost",
+            "-Dauditing.enabled=false",
+            "-Dmicroservice.services.access-control.enabled=true",
+            "-Dmicroservice.services.access-control.allow-list.0=email-gateway",
+            "-Dmicroservice.services.access-control.allow-list.1=email-insights-performance-tests"
             ],
             "EMAIL_INSIGHTS": [
-                "-J-Dmicroservice.email-insights.database.dbName=postgres",
-                "-J-Dauditing.enabled=false"
+            "-Dapplication.router=testOnlyDoNotUseInAppConf.Routes",
+            "-Ddb.emailinsights.url=jdbc:postgresql://localhost:5432/",
+            "-Dplay.evolutions.db.emailinsights.autoApplyDowns=true",
+            "-Dauditing.enabled=false"
             ],
             "CIP_RISK": [
-                "-J-Dauditing.enabled=false"
+            "-Dapplication.router=testOnlyDoNotUseInAppConf.Routes",
+            "-Dplay.evolutions.db.risk.autoApplyDowns=true",
+            "-Dauditing.enabled=false"
             ]
         }'
