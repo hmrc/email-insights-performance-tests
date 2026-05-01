@@ -19,8 +19,10 @@ import sbt.*
 object Dependencies {
 
   val test: Seq[ModuleID] = Seq(
-    "com.typesafe" % "config"                  % "1.4.5" % Test,
-    "uk.gov.hmrc" %% "performance-test-runner" % "6.3.0" % Test,
-    "uk.gov.hmrc" %% "api-test-runner"         % "0.10.0"
+    "com.typesafe" % "config" % "1.4.5" % Test,
+    ("uk.gov.hmrc" %% "performance-test-runner" % "6.3.0" % Test)
+      .cross(CrossVersion.for3Use2_13),
+    ("uk.gov.hmrc" %% "api-test-runner" % "0.10.0")
+      .cross(CrossVersion.for3Use2_13)
   )
 }
