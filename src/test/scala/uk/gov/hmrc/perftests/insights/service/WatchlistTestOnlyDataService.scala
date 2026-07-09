@@ -37,15 +37,15 @@ trait WatchlistTestOnlyDataService extends HttpClientHelper with Logging {
 
   private def readEmailsFromFeederFile(): Seq[String] = {
     val source = scala.io.Source.fromResource("data/emails.csv")
-      try
-        source
-          .getLines()
-          .drop(1)
-          .map(_.split(","))
-          .collect { case Array(email, risk, _) if risk.trim != "0" => email.trim }
-          .toSeq
-      finally source.close()
-    }
+    try
+      source
+        .getLines()
+        .drop(1)
+        .map(_.split(","))
+        .collect { case Array(email, risk, _) if risk.trim != "0" => email.trim }
+        .toSeq
+    finally source.close()
+  }
 
   def createWatchlistEmails(numberOfGeneratedEmails: Int): Unit = {
     val emails = readEmailsFromFeederFile()
@@ -97,4 +97,38 @@ trait WatchlistTestOnlyDataService extends HttpClientHelper with Logging {
 
     logger.info(s"Deleted emails from graph testonly endpoint, response status: ${response.status} and body: ${response.body}")
   }
+
+  def createCountsData(numberOfEmails: Int, numberOfAttributeGroupsPerEmail: Int): Unit = {
+    val emails = readEmailsFromFeederFile()
+
+    val payload = Json.obj(
+      "generatedEntries" -> Json.obj(
+        "numberOfEmails"                  -> numberOfEmails,
+        "numberOfAttributeGroupsPerEmail" -> numberOfAttributeGroupsPerEmail
+      ),
+      "manualEntries"    -> Json.obj(
+        "emailAddresses"                  -> emails,
+        "numberOfAttributeGroupsPerEmail" -> 2
+      )
+    )
+
+    val request = Json.stringify(payload)
+
+    val response: StandaloneWSResponse =
+      post(s"$baseUrl/email-insights/test-only/occurrence-logs/data/create", request, headers: _*)
+
+    logger.info(
+      s"Inserted emails Occurence Count log to counts testonly endpoint, response status: ${response.status} and body: ${response.body}"
+    )
+  }
+
+  def deleteCountsData(): Unit = {
+    val response: StandaloneWSResponse =
+      delete(s"$baseUrl/email-insights-proxy/test-only/occurrence-logs/data/delete", headers: _*)
+
+    logger.info(
+      s"Deleted emails Occurence Count log from counts, response status: ${response.status} and body: ${response.body}"
+    )
+  }
+
 }
